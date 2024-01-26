@@ -1,0 +1,85 @@
+common:
+  fp16: true
+#  on_cpu_convert_precision: true
+#  fp16_init_scale: 4
+#  threshold_loss_scale: 1
+  fp16_no_flatten_grads: true
+#  fp16_scale_window: 128
+  log_format: json
+  log_interval: 200
+
+task:
+  _name: personality_detection
+  data: /data/tangqirui/fairseq/DATA-bin/kaggle-8-random/doc_dataset
+  num_classes: 2
+  max_positions: 512
+  classify_task: doc
+  personality: mbti
+  class_name: JP
+  feats_type: [doc_mairesse, doc_senticnet, doc_emotion, seg_mairesse, seg_senticnet, seg_emotion]
+
+checkpoint:
+  finetune_from_model: /data/tangqirui/fairseq/download/model.pt
+  best_checkpoint_metric: f1
+  maximize_best_checkpoint_metric: true
+  no_epoch_checkpoints: true
+  no_save: true
+
+criterion:
+  _name: personality_detection
+
+dataset:
+  batch_size: 4
+  required_batch_size_multiple: 1
+  max_tokens: 15000000
+  valid_subset: valid,test
+
+optimization:
+  clip_norm: 0.0
+  lr: [0]
+  max_update: 1700
+  max_epoch: 10
+  update_freq: [8]
+
+optimizer:
+  _name: composite
+  dynamic_groups: false
+  groups:
+    soft:
+      lr_float: 5e-05
+      optimizer:
+        _name: adam
+        adam_betas: [0.9,0.98]
+        adam_eps: 1e-06
+        weight_decay: 0.1
+      lr_scheduler:
+        _name: polynomial_decay
+        warmup_updates: 300
+    solid:
+      lr_float: 1e-05
+      optimizer:
+        _name: adam
+        adam_betas: [0.9,0.98]
+        adam_eps: 1e-06
+        weight_decay: 0.1
+      lr_scheduler:
+        _name: polynomial_decay
+        warmup_updates: 300
+
+lr_scheduler: pass_through
+
+model:
+  _name: model_IAN
+  num_segments: 8
+  num_stack: 2
+  append_doc_psycho: true
+  ens_by_seg: false
+  mean_by_seg: true
+
+  dropout: 0.0
+  attention_dropout: 0.0
+  pooler_dropout: 0.5
+
+  random_initial_layers: 0
+  freeze_embeddings: false
+  n_trans_layers_to_freeze: 0
