@@ -1,3 +1,50 @@
+# Index Attention Network
+
+*Using Psycholinguistic Clues to Index Deep Semantic Evidences: Personality Detection in Social Media Texts*
+
+## Dataset
+
+Kaggle (Twitter): https://www.kaggle.com/datasnaek/mbti-type
+
+Pandora (Reddit): https://psy.takelab.fer.hr/datasets/all/
+
+## Experimental Result
+
+### Kaggle
+
+| Model  | E/I  | S/N  | T/F  |  J/P | Ave  |
+| ------------ | ------------ | ------------ | ------------ | ------------ | ------------ |
+|IAN (1+1)	|77.48	|76.10	|80.73	|79.42	|78.43|
+|IAN (2+2)	|83.68	|82.14	|85.63	|83.14	|83.65|
+|IAN (3+3)	|87.92	|84.48	|87.16	|86.89	|86.61|
+
+### Pandora
+
+| Model  | E/I  | S/N  | T/F  |  J/P | Ave  |
+| ------------ | ------------ | ------------ | ------------ | ------------ | ------------ |
+|IAN	|57.85	|55.23	|64.61	|57.84	|58.88|
+|IAN (*cluster)	|62.67	|58.33	|69.34	|59.31	|62.41|
+
+## Requirements
+- python 3.8.5
+- pytorch 2.0.1
+- transformers 4.29.2
+- fairseq 0.12.2
+
+## Steps
+
+### Process Data
+sh preprocess_PD_tasks
+
+### Training
+sh hydra_train_PD_tasks
+
+### Hyper-Parameter
+DATA-bin/kaggle-8-random/doc_dataset/config/base.yaml
+
+
+# Following is README of Fairseq
+
 <p align="center">
   <img src="docs/fairseq_logo.png" width="150">
   <br />
