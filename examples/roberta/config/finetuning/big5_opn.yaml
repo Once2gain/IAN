@@ -1,0 +1,117 @@
+# @package _group_
+
+common:
+  fp16: true
+  fp16_init_scale: 4
+  threshold_loss_scale: 1
+#  fp16_no_flatten_grads: true
+  fp16_scale_window: 128
+  log_format: json
+  log_interval: 200
+
+task:
+  _name: personality_detection
+  data: /data/tangqirui/fairseq/PD-bin/output/fold-0
+  num_classes: 2
+  max_positions: 512
+  disable_feats: False
+  doc_form: True
+  label_type: neu
+  vote: True
+
+checkpoint:
+  restore_file: /data/tangqirui/fairseq/outputs/2023-06-13/15-15-29/checkpoints/checkpoint_best.pt
+  reset_optimizer: true
+  reset_dataloader: true
+  reset_meters: true
+  best_checkpoint_metric: accuracy
+  maximize_best_checkpoint_metric: true
+  no_epoch_checkpoints: true
+
+criterion:
+  _name: personality_detection
+  classification_head_name: document_classification_head
+
+dataset:
+  batch_size: 32
+  required_batch_size_multiple: 1
+  max_tokens: 8000
+
+lr_scheduler:
+  _name: polynomial_decay
+  warmup_updates: 43
+
+optimization:
+  clip_norm: 0.0
+  lr: [1e-05]
+  max_update: 723
+  max_epoch: 15
+#  update_freq: [4]
+
+optimizer:
+  _name: adam
+  weight_decay: 0.1
+  adam_betas: (0.9,0.98)
+  adam_eps: 1e-06
+
+model:
+  _name: sen2doc
+  arch: cnn
+  seg_feats: False
+  sep_encode: False
+  fused_feats: True
+  embed_feats: False
+
+  dropout: 0.1
+  attention_dropout: 0.1
+  pooler_dropout: 0.3
+
+  random_initial_layers: 0
+  freeze_encoder: True
+  n_trans_layers_to_freeze: 12
+  freeze_doc_encoder: True
+
+
+#optimization:
+#  clip_norm: 0.0
+#  lr: [0]
+#  max_update: 723
+#  max_epoch: 50
+#  update_freq: [8]
+#
+#optimizer:
+#  _name: composite
+#  dynamic_groups: true
+#  groups:
+#    soft:
+#      lr_float: 1e-05
+#      optimizer:
+#        _name: adam
+#        adam_betas: [0.9,0.98]
+#        adam_eps: 1e-06
+#        weight_decay: 0.1
+#      lr_scheduler:
+#        _name: polynomial_decay
+#        warmup_updates: 60
+#    solid:
+#      lr_float: 2e-06
+#      optimizer:
+#        _name: adam
+#        adam_betas: [ 0.9,0.98 ]
+#        adam_eps: 1e-06
+#        weight_decay: 0.1
+#      lr_scheduler:
+#        _name: polynomial_decay
+#        warmup_updates: 100
+#    default:
+#      lr_float: 8e-05
+#      optimizer:
+#        _name: adam
+#        adam_betas: [0.9,0.98]
+#        adam_eps: 1e-06
+#        weight_decay: 0.1
+#      lr_scheduler:
+#        _name: polynomial_decay
+#        warmup_updates: 30
+#
+#lr_scheduler: pass_through
